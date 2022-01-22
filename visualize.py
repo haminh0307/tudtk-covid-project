@@ -26,14 +26,15 @@ for day in vaccine_df.columns.values:
     case.append(covid_df[day])
     death.append(death_df[day])
 
-
+# visualize twice injected
 # plt.bar(days, vaccinated)
 # plt.xticks([])
 # plt.xlabel('Day')
 # plt.ylabel('Twice injected')
 # plt.title('Twice injected by day, from 13/9/2021 to 21/1/2022')
-# plt.savefig('twice_injected.pdf', format='pdf')
+# plt.savefig('plot/twice_injected.pdf', format='pdf')
 
+# visualize case and death
 plt.bar(days, death, color='red')
 plt.bar(days, case, color='orange', bottom=death)
 plt.xticks([])
@@ -44,4 +45,4 @@ colors = {'case': 'orange', 'death': 'red'}
 labels = list(colors.keys())
 handles = [plt.Rectangle((0, 0), 1, 1, color=colors[label]) for label in labels]
 plt.legend(handles, labels)
-plt.savefig('case_and_death.pdf', format='pdf')
+plt.savefig('plot/case_and_death.pdf', format='pdf')

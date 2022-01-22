@@ -1,6 +1,5 @@
 import requests
 import pandas
-import numpy as np
 
 data = {'id': []}
 

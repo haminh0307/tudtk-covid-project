@@ -1,44 +1,63 @@
 import pandas
-from matplotlib import pyplot as plt
 
-POPULATION = 98694816
+POPULATION = 98694816 # Vietnam population
 
 
 def preprocess(df, denoise=False):
+    """
+    Preprocess dataframe
+    :param df: dataframe
+    :param denoise: if True, replace outlier by zero
+    :return: new dataframe
+    """
     df.fillna(0)
     if denoise:
         df[df > 10 * df.mean()] = 0
     return df
 
 
-def get_data(vaccine='data/vaccine.csv', covid='data/covid.csv', death='data/death.csv', period=7):
+def get_data(vaccine='data/vaccine.csv', case='data/case.csv', death='data/death.csv', period=7):
+    """
+    Get data from vaccine, case and death dataframe
+    :param vaccine: path to vaccine csv
+    :param case: path to case csv
+    :param death: path to death csv
+    :param period: number of days per sample
+    :return: sample X, Y
+    """
     vaccine_df = pandas.read_csv(vaccine, index_col=0)
     vaccine_df = preprocess(vaccine_df)
 
-    covid_df = pandas.read_csv(covid, index_col=0)
-    covid_df = covid_df.sum()
-    covid_df = preprocess(covid_df, denoise=True)
+    case_df = pandas.read_csv(case, index_col=0)
+    case_df = case_df.sum() # sum case by day
+    case_df = preprocess(case_df, denoise=True) # case dataframe has noise
 
     death_df = pandas.read_csv(death, index_col=0)
-    death_df = death_df.sum()
+    death_df = death_df.sum() # sum death by day
     death_df = preprocess(death_df)
 
     X = []
     Y = []
 
     count = 0
+    vaccinated = 0
     cnt_death = 0
     cnt_case = 0
 
     for day in vaccine_df.columns.values:
-        if day not in covid_df or day not in death_df:
+        if day not in case_df or day not in death_df:
             continue
+        # number of twice injected in first day of period
+        if count == 0:
+            vaccinated = vaccine_df[day][2]
+        # cummulative case and death
+        cnt_case += case_df[day]
         cnt_death += death_df[day]
-        cnt_case += covid_df[day]
         count += 1
+        # new sample
         if count == period:
             if cnt_case > 0:
-                X.append(vaccine_df[day][2] / POPULATION)
+                X.append(vaccinated / POPULATION)
                 Y.append(cnt_death / cnt_case)
             count = 0
             cnt_case = 0
