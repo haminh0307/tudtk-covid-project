@@ -1,40 +1,21 @@
-import pandas
-from matplotlib import pyplot as plt
+import numpy
+import matplotlib.pyplot as plt
+import data
+from sklearn.metrics import r2_score, mean_squared_error
 
-POPULATION = 98694816
-PERIOD = 3
+X, Y = data.get_data(period=4)
+n = len(X)
+n_train = int(0.9 * n)
 
-vaccine_df = pandas.read_csv('vaccine.csv', index_col=0)
+mymodel = numpy.poly1d(numpy.polyfit(X[:n_train], Y[:n_train], 3))
 
-covid_df = pandas.read_csv('covid.csv', index_col=0)
-covid_df.replace(-1, 0)
-covid_df = covid_df.sum()
+print('Mean squared error:', mean_squared_error(Y, mymodel(X)))
+print('RMSE mean squared error:', mean_squared_error(Y, mymodel(X), squared=False))
+print('R-square:', r2_score(Y, mymodel(X)))
 
-death_df = pandas.read_csv('death.csv', index_col=0)
-death_df.replace(-1, 0)
-death_df = death_df.sum()
+myline = numpy.linspace(0, 1, 100)
 
-X = []
-Y = []
-
-count = 0
-cnt_death = 0
-cnt_case = 0
-
-for day in vaccine_df.columns.values:
-    if day not in covid_df or day not in death_df:
-        continue
-    cnt_death += death_df[day]
-    cnt_case += covid_df[day]
-    count += 1
-    if count == PERIOD:
-        if cnt_case > 0:
-            X.append(vaccine_df[day][2] / POPULATION)
-            Y.append(cnt_death / cnt_case)
-        count = 0
-        cnt_case = 0
-        cnt_death = 0
-
-plt.scatter(X, Y)
+plt.scatter(X[:n_train], Y[:n_train])
+plt.scatter(X[n_train:], Y[n_train:], color='red')
+plt.plot(myline, mymodel(myline))
 plt.show()
-

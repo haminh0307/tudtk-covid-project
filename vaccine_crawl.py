@@ -15,4 +15,4 @@ for i in range(2, 65):
             data[day][idx] += count
 
 df = pandas.DataFrame(data)
-df.to_csv('vaccine.csv', index=index)
+df.to_csv('data/vaccine.csv', index=index)

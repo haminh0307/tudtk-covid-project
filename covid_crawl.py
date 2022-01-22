@@ -1,5 +1,6 @@
 import requests
 import pandas
+import numpy as np
 
 data = {'id': []}
 
@@ -9,8 +10,9 @@ for i in range(2, 65):
     print(i, len(req.json()['case_by_day']))
     for day, count in req.json()['case_by_day'].items():
         if day not in data:
-            data[day] = [-1 for _ in range(64)]
-        data[day][i - 1] = count
+            data[day] = [None for _ in range(63)]
+        data[day][i - 2] = count
 
 df = pandas.DataFrame(data)
-df.to_csv('covid.csv', index=False)
+
+df.to_csv('data/covid.csv', index=False)
