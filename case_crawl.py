@@ -15,4 +15,4 @@ for i in range(2, 65):
 
 df = pandas.DataFrame(data)
 
-df.to_csv('data/covid.csv', index=False)
+df.to_csv('data/case.csv', index=False)
