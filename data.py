@@ -1,4 +1,5 @@
 import pandas
+import numpy as np
 
 POPULATION = 98694816 # Vietnam population
 
@@ -12,7 +13,8 @@ def preprocess(df, denoise=False):
     """
     df.fillna(0)
     if denoise:
-        df[df > 10 * df.mean()] = 0
+        df[df > 3 * df.mean()] = np.nan
+        df = df.fillna(method='ffill')
     return df
 
 
@@ -29,10 +31,12 @@ def get_data(vaccine='data/vaccine.csv', case='data/case.csv', death='data/death
     vaccine_df = preprocess(vaccine_df)
 
     case_df = pandas.read_csv(case, index_col=0)
+    case_df = case_df.loc[:, '13/9/2021':]
     case_df = case_df.sum() # sum case by day
     case_df = preprocess(case_df, denoise=True) # case dataframe has noise
 
     death_df = pandas.read_csv(death, index_col=0)
+    death_df = death_df.loc[:, '13/9/2021':]
     death_df = death_df.sum() # sum death by day
     death_df = preprocess(death_df)
 

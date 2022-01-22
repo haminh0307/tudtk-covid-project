@@ -5,11 +5,13 @@ from data import preprocess
 vaccine_df = pandas.read_csv('data/vaccine.csv', index_col=0)
 vaccine_df = preprocess(vaccine_df)
 
-covid_df = pandas.read_csv('data/covid.csv', index_col=0)
-covid_df = covid_df.sum()
-covid_df = preprocess(covid_df, denoise=True)
+case_df = pandas.read_csv('data/case.csv', index_col=0)
+case_df = case_df.loc[:, '13/9/2021':]
+case_df = case_df.sum()
+case_df = preprocess(case_df, denoise=True)
 
 death_df = pandas.read_csv('data/death.csv', index_col=0)
+death_df = death_df.loc[:, '13/9/2021':]
 death_df = death_df.sum()
 death_df = preprocess(death_df)
 
@@ -19,11 +21,11 @@ case = []
 death = []
 
 for day in vaccine_df.columns.values:
-    if day not in covid_df or day not in death_df:
+    if day not in case_df or day not in death_df:
         continue
     days.append(day)
     vaccinated.append(vaccine_df[day][2])
-    case.append(covid_df[day])
+    case.append(case_df[day])
     death.append(death_df[day])
 
 # visualize twice injected
@@ -39,7 +41,7 @@ plt.bar(days, death, color='red')
 plt.bar(days, case, color='orange', bottom=death)
 plt.xticks([])
 plt.xlabel('Day')
-plt.ylabel('Case')
+# plt.ylabel('Case')
 plt.title('Case and death by day, from 13/9/2021 to 21/1/2022')
 colors = {'case': 'orange', 'death': 'red'}
 labels = list(colors.keys())
